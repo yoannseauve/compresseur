@@ -20,6 +20,15 @@ SECTIONS
 		. = ALIGN(4);
 		*(.text)
 		*(.text.*)
+		. = ALIGN(4);
+	} > FLASH
+
+	.rodata :
+	{
+		. = ALIGN(4);
+		*(.rodata)
+		*(.rodata.*)
+		. = ALIGN(4);
 	} > FLASH
 	
 	_sidata = LOADADDR(.data);
@@ -34,6 +43,7 @@ SECTIONS
 	
 	.bss :
 	{
+		. = ALIGN(4);
 		_sbss = .;
 		*(.bss)
 		*(.bss.*)
