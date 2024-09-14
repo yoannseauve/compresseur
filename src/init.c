@@ -6,7 +6,9 @@ void clkSetup()
 	RCC->CFGR3 |= RCC_CFGR3_USART1SW_0 | RCC_CFGR3_USART1SW_1; //HSI (8MHz) set as uart1 clk
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN    //enable GPIO port A clk
 		| RCC_AHBENR_GPIOBEN;    //enable GPIO port B clk
-	RCC->APB2ENR |= RCC_APB2ENR_USART1EN; //enable USART1 clk
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_ADC1EN; //enable USART1 and ADC1 clk
+	RCC->CR2 |= RCC_CR2_HSI14ON; //Start HSI14 RC oscillator
+	while ((RCC->CR2 & RCC_CR2_HSI14RDY) == 0);
 
 }
 
@@ -30,4 +32,7 @@ void gpioSetup()
 
 	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR10_0; //activates pull-up on PA10 (UART1RX)
 	GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR10_1); //activates pull-up on PA10 (UART1RX)
+
+	GPIOA->MODER &= ~(GPIO_MODER_MODER0_0 | GPIO_MODER_MODER0_1); //set PA0 as floating analog input
+	GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR0_0 | GPIO_PUPDR_PUPDR0_1);
 }
