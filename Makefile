@@ -1,4 +1,4 @@
-TOOL_PATH = /opt/gcc-arm/lib/gcc/arm-none-eabi/10.3.1
+TOOL_PATH = /opt/gcc-arm/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp
 CC = arm-none-eabi-gcc -ffreestanding
 AS = arm-none-eabi-as
 LD = arm-none-eabi-ld 
