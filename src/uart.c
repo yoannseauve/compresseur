@@ -2,9 +2,9 @@
 #include "stm32f030x6.h"
 #include "uart.h"
 
-static char uartTxBuff[UART_TX_BUFF_SIZE];
-static unsigned int uartTxBuffWriteIndex = 0;
-static unsigned int uartTxBuffReadIndex = 0;
+static volatile char uartTxBuff[UART_TX_BUFF_SIZE];
+static volatile unsigned int uartTxBuffWriteIndex = 0;
+static volatile unsigned int uartTxBuffReadIndex = 0;
 
 struct uartRxData uartRxData = {{"", ""}, {0, 0}, 0, 0, -1};
 
