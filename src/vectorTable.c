@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "uart.h"
+#include "timer.h"
 
 void _reset_handler(void);
 
@@ -37,7 +38,7 @@ void (*__interupt__vectors__[]) (void) __attribute__((section(".vector_table")))
 	NULL,				//TIM1_BRK_UP_ 		TRG_COM TIM1 break, update, trigger and commutation interrupt 							0x0000 0074
 	NULL,				//TIM1_CC 		TIM1 capture compare interrupt 																0x0000 0078
 	NULL,				//Reserved 		- 																							0x0000 007C
-	NULL,				//TIM3 			TIM3 global interrupt 																		0x0000 0080
+	tim3_INTERRUPT,				//TIM3 			TIM3 global interrupt 																		0x0000 0080
 	NULL,				//TIM6 			TIM6 global interrupt 																		0x0000 0084
 	NULL,				//Reserved 		- 																							0x0000 0088
 	NULL,				//TIM14 		TIM14 global interrupt 																		0x0000 008C
