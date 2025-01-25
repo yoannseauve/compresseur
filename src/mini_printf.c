@@ -27,7 +27,15 @@ int mini_printf(const char* formatString, ...)
 
 	while(*formatString != '\0' )
 	{
-		if(*formatString == '%')
+		if(*formatString == '\\')
+		{
+			if(*++formatString != '\0' )
+			{
+				uart1PutC(*formatString);
+				buffCount++;
+			}
+		}
+		else if(*formatString == '%')
 		{
 			switch(*++formatString)
 			{
