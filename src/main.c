@@ -5,6 +5,8 @@
 #include "uart.h"
 #include "mini_printf.h"
 #include "adc.h"
+#include "timer.h"
+#include "userInterface.h"
 
 void main (void)
 {
@@ -12,10 +14,10 @@ void main (void)
 	gpioSetup();
 	uart1Setup();
 	adc_init();
+	timerInit();
 
 
 	volatile int i;
-	char* uartRx;
 	
 
 	for(;;)
@@ -25,7 +27,11 @@ void main (void)
 		GPIOB->BSRR = GPIO_BSRR_BR_1; // reset PB1
 		for (i=0; i<0x0FFFF; i++);
 
-	mini_printf("> %d\n", adc_read_temp());
+	//mini_printf("> %d", adc_read_temp());
+	//mini_printf("-> %d", powerGridPeriode);
+	//mini_printf("");
+	
+	TUIInterfaceStep();
 	}
 
 }
