@@ -6,7 +6,7 @@
 float regParamP = 0.0;
 float regParamI = 0.0;
 float regParamD = 0.0;
-float regParamIMax = 100.0;
+float regParamIMax = 1.0;
 float regParamIMin = 0.0;
 
 int targetTemp = 0;
@@ -18,8 +18,8 @@ void setOutputPower(float percent)
 {
 	if(powerGridPeriode != 0)
 	{
-		if(percent > 100.0)
-			percent = 100.0;
+		if(percent > 1.0)
+			percent = 1.0;
 		if(percent < 0.0)
 			percent = 0.0;
 		triacStartTime = powerGridPeriode - __revers_sin_power_lookup__[(int)(percent*100.0)] * (powerGridPeriode - powerGridZeroDuration); //lookup acounts for sin voltage. x% max power != x% sin periode
@@ -36,15 +36,24 @@ void PIDStep()
 {
 	static float integralError = 0.0;
 	static int lastError = 0;
+	static int tick_count = 0;
+
+	if (tick_count++ < PID_FREQ_DIV-1)
+		return;
+	tick_count = 0;
 
 	if(regulationMode == automatic && powerGridPeriode != 0)
 	{
 		int error = targetTemp - adc_read_temp();
 		int derivativError = error - lastError;
 
-		setOutputPower(error*regParamP + derivativError*regParamD + integralError*regParamI);
+		setOutputPower(error*regParamP + derivativError*regParamD + integralError);
 
-		integralError += error;
+		integralError += regParamI * (float)(error);
+		if(integralError > regParamIMax)
+			integralError = regParamIMax;
+		if(integralError < regParamIMin)
+			integralError = regParamIMin;
 	}
 	else
 		setOutputPower(setOutputPowerValue);
