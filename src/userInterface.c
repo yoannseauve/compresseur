@@ -22,14 +22,14 @@ void TUIInterfaceStep() // manage text User Interface
 			mini_printf(">currently in [auto] mode");
 		if(regulationMode == manual)
 			mini_printf(">currenty in [manual] mode");
-		mini_printf(">debug -> enter debug isplay mode (log all parameters)");
+		mini_printf(">debug -> enter debug display mode (log all parameters)");
 		mini_printf(">manual -> enter manual mode with output power set by user");
 		mini_printf(">auto -> enter automatic mode with output power regulated for temp to reach it's target value");
 		mini_printf(">set output xx -> set output to xx \\%, enters manual mode");
 		mini_printf(">set temp xx -> set target temperature to xx°");
 		mini_printf(">PID -> display PID settings");
 		mini_printf(">PID set p XX.XXX > set P parameter to XX.XXX");
-		mini_printf(">PID set I XX.XXX > set I parameter to XX.XXX");
+		mini_printf(">PID set I XXXXX > set I parameter to 0.XXXXX");
 		mini_printf(">PID set D XX.XXX > set D parameter to XX.XXX");
 	}
 	else if(mini_snscanf(buffer, bufferSize, "manual") == 6)
@@ -50,7 +50,7 @@ void TUIInterfaceStep() // manage text User Interface
 	}
 	else if(mini_snscanf(buffer, bufferSize, "set temp %u", &dataInput) >= 10)
 	{
-		mini_printf(">target temperature set to %d \\%", dataInput);
+		mini_printf(">target temperature set to %d \\°C", dataInput);
 		targetTemp = dataInput;
 	}
 	else if(mini_snscanf(buffer, bufferSize, "PID set P %u.%u", &dataInput, &dataInput2) == 16)
@@ -58,10 +58,10 @@ void TUIInterfaceStep() // manage text User Interface
 		mini_printf(">PID P param set to %d.%d", dataInput, dataInput2);
 		regParamP = (float)dataInput + 0.001 * (float)dataInput2;
 	}
-	else if(mini_snscanf(buffer, bufferSize, "PID set I %u.%u", &dataInput, &dataInput2) == 16)
+	else if(mini_snscanf(buffer, bufferSize, "PID set I %u", &dataInput) == 15)
 	{
-		mini_printf(">PID I param set to %d.%d", dataInput, dataInput2);
-		regParamI = (float)dataInput + 0.001 * (float)dataInput2;
+		mini_printf(">PID I param set to 0.%d", dataInput);
+		regParamI = 0.00001 * (float)dataInput;
 	}
 	else if(mini_snscanf(buffer, bufferSize, "PID set D %u.%u", &dataInput, &dataInput2) == 16)
 	{
@@ -79,7 +79,7 @@ void TUIInterfaceStep() // manage text User Interface
 						state = debugDisaplay;
 					else if (mini_snscanf(buffer, bufferSize, "PID") == 3)
 					{
-						mini_printf(">target_tmp = %d P = %d.%d I = %d.%d D = %d.%d min_int = %d.%d max_int = %d.%d", targetTemp, (int)regParamP, (int)(regParamP*1000)%1000, (int)regParamI, (int)(regParamI*1000)%1000, (int)regParamD, (int)(regParamD*1000)%1000, (int)regParamIMin, (int)(regParamIMin*1000)%1000, (int)regParamIMax, (int)(regParamIMax*1000)%1000);
+						mini_printf(">target_tmp = %d P = %d.%d I = 0.%d D = %d.%d min_int = %d.%d max_int = %d.%d", targetTemp, (int)regParamP, (int)(regParamP*1000)%1000, (int)(regParamI*100000), (int)regParamD, (int)(regParamD*1000)%1000, (int)(regParamIMin*100.0), (int)(regParamIMin*100000)%1000, (int)(regParamIMax*100.0), (int)(regParamIMax*100000)%1000);
 					}
 					else
 						mini_printf("unrecognized command, type help to list available options");
@@ -87,7 +87,7 @@ void TUIInterfaceStep() // manage text User Interface
 				break;
 
 			case debugDisaplay :
-				mini_printf(">temp = %d target_temp = %d grid_periode = %d set_out_pwr = %d.%d", adc_read_temp(), targetTemp, powerGridPeriode, (int)readOutputPower(), (int)(readOutputPower()*100)%100);
+				mini_printf(">temp = %d target_temp = %d grid_periode = %d set_out_pwr = %d\\%", adc_read_temp(), targetTemp, powerGridPeriode,(int)(readOutputPower()*100));
 				if(buffer != NULL)
 					state = init;
 				break;
