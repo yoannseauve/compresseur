@@ -1,6 +1,7 @@
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 16K
+  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 15K
+  FLASH_MEM (rw) : ORIGIN = 0x08003C00, LENGTH = 1K
   RAM (rxw)  : ORIGIN = 0x20000000, LENGTH = 4K
 }
 
@@ -50,8 +51,18 @@ SECTIONS
 		_ebss = .;
 	} > RAM
 	
+	_start_stored_settings  = LOADADDR(.stored_settings);
+	.stored_settings :
+	{
+		. = ALIGN(4);
+		_sstored_settings = .;
+		*(.stored_settings)
+		_estored_settings = .;
+	} > RAM AT> FLASH_MEM
+
 	.leftStack :
 	{
 		. = . + _Min_Leftover_RAM;
 	} > RAM
+
 }

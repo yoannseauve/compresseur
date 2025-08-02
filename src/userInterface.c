@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "mini_printf.h"
 #include "power_drive.h"
+#include "parameters.h"
 
 static enum TUIstate state = init;
 
@@ -31,6 +32,7 @@ void TUIInterfaceStep() // manage text User Interface
 		mini_printf(">PID set p XX.XXX > set P parameter to XX.XXX");
 		mini_printf(">PID set I XXXXX > set I parameter to 0.XXXXX");
 		mini_printf(">PID set D XX.XXX > set D parameter to XX.XXX");
+		mini_printf(">store > store PID setings");
 	}
 	else if(mini_snscanf(buffer, bufferSize, "manual") == 6)
 	{
@@ -51,22 +53,27 @@ void TUIInterfaceStep() // manage text User Interface
 	else if(mini_snscanf(buffer, bufferSize, "set temp %u", &dataInput) >= 10)
 	{
 		mini_printf(">target temperature set to %d \\°C", dataInput);
-		targetTemp = dataInput;
+		PID_params.var_vue.targetTemp = dataInput;
 	}
 	else if(mini_snscanf(buffer, bufferSize, "PID set P %u.%u", &dataInput, &dataInput2) == 16)
 	{
 		mini_printf(">PID P param set to %d.%d", dataInput, dataInput2);
-		regParamP = (float)dataInput + 0.001 * (float)dataInput2;
+		PID_params.var_vue.regParamP = (float)dataInput + 0.001 * (float)dataInput2;
 	}
 	else if(mini_snscanf(buffer, bufferSize, "PID set I %u", &dataInput) == 15)
 	{
 		mini_printf(">PID I param set to 0.%d", dataInput);
-		regParamI = 0.00001 * (float)dataInput;
+		PID_params.var_vue.regParamI = 0.00001 * (float)dataInput;
 	}
 	else if(mini_snscanf(buffer, bufferSize, "PID set D %u.%u", &dataInput, &dataInput2) == 16)
 	{
 		mini_printf(">PID D param set to %d.%d", dataInput, dataInput2);
-		regParamD = (float)dataInput + 0.001 * (float)dataInput2;
+		PID_params.var_vue.regParamD = (float)dataInput + 0.001 * (float)dataInput2;
+	}
+	else if(mini_snscanf(buffer, bufferSize, "store") == 5)
+	{
+		storeMem();
+		mini_printf("settings stored");
 	}
 
 	else
@@ -79,7 +86,7 @@ void TUIInterfaceStep() // manage text User Interface
 						state = debugDisaplay;
 					else if (mini_snscanf(buffer, bufferSize, "PID") == 3)
 					{
-						mini_printf(">target_tmp = %d P = %d.%d I = 0.%d D = %d.%d min_int = %d.%d max_int = %d.%d", targetTemp, (int)regParamP, (int)(regParamP*1000)%1000, (int)(regParamI*100000), (int)regParamD, (int)(regParamD*1000)%1000, (int)(regParamIMin*100.0), (int)(regParamIMin*100000)%1000, (int)(regParamIMax*100.0), (int)(regParamIMax*100000)%1000);
+						mini_printf(">target_tmp = %d P = %d.%d I = 0.%d D = %d.%d min_int = %d.%d max_int = %d.%d", PID_params.var_vue.targetTemp, (int)PID_params.var_vue.regParamP, (int)(PID_params.var_vue.regParamP*1000)%1000, (int)(PID_params.var_vue.regParamI*100000), (int)PID_params.var_vue.regParamD, (int)(PID_params.var_vue.regParamD*1000)%1000, (int)(regParamIMin*100.0), (int)(regParamIMin*100000)%1000, (int)(regParamIMax*100.0), (int)(regParamIMax*100000)%1000);
 					}
 					else
 						mini_printf("unrecognized command, type help to list available options");
@@ -87,7 +94,7 @@ void TUIInterfaceStep() // manage text User Interface
 				break;
 
 			case debugDisaplay :
-				mini_printf(">temp = %d target_temp = %d grid_periode = %d set_out_pwr = %d\\%", adc_read_temp(), targetTemp, powerGridPeriode,(int)(readOutputPower()*100));
+				mini_printf(">temp = %d target_temp = %d grid_periode = %d set_out_pwr = %d\\%", adc_read_temp(), PID_params.var_vue.targetTemp, powerGridPeriode,(int)(readOutputPower()*100));
 				if(buffer != NULL)
 					state = init;
 				break;

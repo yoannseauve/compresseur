@@ -16,7 +16,6 @@ void main (void)
 	adc_init();
 	timerInit();
 
-
 	volatile int i;
 	
 

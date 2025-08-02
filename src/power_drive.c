@@ -2,14 +2,15 @@
 #include "timer.h"
 #include "adc.h"
 #include "lookup_math.h"
+#include "parameters.h"
 
-float regParamP = 0.0;
-float regParamI = 0.0;
-float regParamD = 0.0;
+//float regParamP = 0.0;
+//float regParamI = 0.0;
+//float regParamD = 0.0;
 float regParamIMax = 1.0;
 float regParamIMin = 0.0;
 
-int targetTemp = 0;
+//int targetTemp = 0;
 enum regulationMode regulationMode = automatic;
 
 static float setOutputPowerValue; //percent of output power set by "setOutputPower()"
@@ -44,12 +45,12 @@ void PIDStep()
 
 	if(regulationMode == automatic && powerGridPeriode != 0)
 	{
-		int error = targetTemp - adc_read_temp();
+		int error = PID_params.var_vue.targetTemp - adc_read_temp();
 		int derivativError = error - lastError;
 
-		setOutputPower(error*regParamP + derivativError*regParamD + integralError);
+		setOutputPower(error*PID_params.var_vue.regParamP + derivativError*PID_params.var_vue.regParamD + integralError);
 
-		integralError += regParamI * (float)(error);
+		integralError += PID_params.var_vue.regParamI * (float)(error);
 		if(integralError > regParamIMax)
 			integralError = regParamIMax;
 		if(integralError < regParamIMin)
